@@ -1,5 +1,10 @@
 Janus WebRTC Gateway
 ====================
+##Shield Janus setup
+
+This repo will be cloned and installed properly by the `janus-setup` ansible script
+
+====================
 
 Janus is an open source, general purpose, WebRTC gateway designed and
 developed by [Meetecho](http://www.meetecho.com). This version
@@ -65,10 +70,10 @@ attempting an installation on a CentOS machine instead.
 
 On Ubuntu or Debian, it would require something like this:
 
-	aptitude install libmicrohttpd-dev libjansson-dev libnice-dev \
-		libssl-dev libsrtp-dev libsofia-sip-ua-dev libglib2.0-dev \
-		libopus-dev libogg-dev libcurl4-openssl-dev pkg-config gengetopt \
-		libtool automake
+    aptitude install libmicrohttpd-dev libjansson-dev libnice-dev \
+        libssl-dev libsrtp-dev libsofia-sip-ua-dev libglib2.0-dev \
+        libopus-dev libogg-dev libcurl4-openssl-dev pkg-config gengetopt \
+        libtool automake
 
 * *Note:* please notice that libopus may not be available out of the box
 on Ubuntu or Debian, unless you're using a recent version (e.g., Ubuntu
@@ -79,11 +84,11 @@ uninstall that version and [install 1.5 manually](https://github.com/cisco/libsr
 In fact, 1.4.x is known to cause several issues with WebRTC. Installation
 is quite straightforward:
 
-	wget https://github.com/cisco/libsrtp/archive/v1.5.4.tar.gz
-	tar xfv v1.5.4.tar.gz
-	cd libsrtp-1.5.4
-	./configure --prefix=/usr --enable-openssl
-	make shared_library && sudo make install
+    wget https://github.com/cisco/libsrtp/archive/v1.5.4.tar.gz
+    tar xfv v1.5.4.tar.gz
+    cd libsrtp-1.5.4
+    ./configure --prefix=/usr --enable-openssl
+    make shared_library && sudo make install
 
 * *Note:* you may need to pass --libdir=/usr/lib64 to the configure
 script if you're installing on a x86_64 distribution.
@@ -92,22 +97,22 @@ If you want to make use of BoringSSL instead of OpenSSL (e.g., because
 you want to take advantage of `--enable-dtls-settimeout`), you'll have
 to manually install it to a specific location. Use the following steps:
 
-	git clone https://boringssl.googlesource.com/boringssl
-	cd boringssl
-	# Don't barf on errors
-	sed -i s/" -Werror"//g CMakeLists.txt
-	# Build
-	mkdir -p build
-	cd build
-	cmake -DCMAKE_CXX_FLAGS="-lrt" ..
-	make
-	cd ..
-	# Install
-	sudo mkdir -p /opt/boringssl
-	sudo cp -R include /opt/boringssl/
-	sudo mkdir -p /opt/boringssl/lib
-	sudo cp build/ssl/libssl.a /opt/boringssl/lib/
-	sudo cp build/crypto/libcrypto.a /opt/boringssl/lib/
+    git clone https://boringssl.googlesource.com/boringssl
+    cd boringssl
+    # Don't barf on errors
+    sed -i s/" -Werror"//g CMakeLists.txt
+    # Build
+    mkdir -p build
+    cd build
+    cmake -DCMAKE_CXX_FLAGS="-lrt" ..
+    make
+    cd ..
+    # Install
+    sudo mkdir -p /opt/boringssl
+    sudo cp -R include /opt/boringssl/
+    sudo mkdir -p /opt/boringssl/lib
+    sudo cp build/ssl/libssl.a /opt/boringssl/lib/
+    sudo cp build/crypto/libcrypto.a /opt/boringssl/lib/
 
 Once the library is installed, you'll have to pass an additional
 ```--enable-boringssl``` flag to the configure script, as by default
@@ -121,10 +126,10 @@ is usually not available in repositories, so if you're interested in
 them (support is optional) you'll have to install it manually. It is a
 pretty easy and standard process:
 
-	git clone https://github.com/sctplab/usrsctp
-	cd usrsctp
-	./bootstrap
-	./configure --prefix=/usr && make && sudo make install
+    git clone https://github.com/sctplab/usrsctp
+    cd usrsctp
+    ./bootstrap
+    ./configure --prefix=/usr && make && sudo make install
 
 * *Note:* you may need to pass --libdir=/usr/lib64 to the configure
 script if you're installing on a x86_64 distribution.
@@ -134,19 +139,19 @@ WebSockets support. If you're interested in supporting WebSockets to
 control Janus, as an alternative (or replacement) to the default plain
 HTTP REST API, you'll have to install it manually:
 
-	git clone git://git.libwebsockets.org/libwebsockets
-	cd libwebsockets
-	# If you want the stable version of libwebsockets, uncomment the next line
-	# git checkout v1.5-chrome47-firefox41
-	mkdir build
-	cd build
-	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_C_FLAGS="-fpic" ..
-	make && sudo make install
+    git clone git://git.libwebsockets.org/libwebsockets
+    cd libwebsockets
+    # If you want the stable version of libwebsockets, uncomment the next line
+    # git checkout v1.5-chrome47-firefox41
+    mkdir build
+    cd build
+    cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_C_FLAGS="-fpic" ..
+    make && sudo make install
 
 * *Note:* if libwebsockets.org is unreachable for any reason, replace
 the first line with this:
 
-	git clone https://github.com/warmcat/libwebsockets.git
+    git clone https://github.com/warmcat/libwebsockets.git
 
 The same applies for Eclipse Paho MQTT C client library, which is needed
 for the optional MQTT support. If you're interested in integrating MQTT
@@ -154,9 +159,9 @@ queues as an alternative (or replacement) to HTTP and/or WebSockets
 to control Janus, you can install the latest version with the
 following steps:
 
-	git clone https://github.com/eclipse/paho.mqtt.c.git
-	cd paho.mqtt.c
-	make && sudo make install
+    git clone https://github.com/eclipse/paho.mqtt.c.git
+    cd paho.mqtt.c
+    make && sudo make install
 
 * *Note:* you may want to set up a different install path for the library,
 to achieve that, replace the last command by 'sudo prefix=/usr make install'.
@@ -170,12 +175,12 @@ RabbitMQ queues as an alternative (or replacement) to HTTP and/or
 WebSockets to control Janus, you can install the latest version with the
 following steps:
 
-	git clone https://github.com/alanxz/rabbitmq-c
-	cd rabbitmq-c
-	git submodule init
-	git submodule update
-	autoreconf -i
-	./configure --prefix=/usr && make && sudo make install
+    git clone https://github.com/alanxz/rabbitmq-c
+    cd rabbitmq-c
+    git submodule init
+    git submodule update
+    autoreconf -i
+    ./configure --prefix=/usr && make && sudo make install
 
 * *Note:* you may need to pass --libdir=/usr/lib64 to the configure
 script if you're installing on a x86_64 distribution.
@@ -188,35 +193,35 @@ documentation as well, you'll need some additional tools too:
 
 On Fedora:
 
-	yum install doxygen graphviz
+    yum install doxygen graphviz
 
 On Ubuntu/Debian:
 
-	aptitude install doxygen graphviz
+    aptitude install doxygen graphviz
 
 
 ##Compile
 Once you have installed all the dependencies, get the code:
 
-	git clone https://github.com/meetecho/janus-gateway.git
-	cd janus-gateway
+    git clone https://github.com/meetecho/janus-gateway.git
+    cd janus-gateway
 
 Then just use:
 
-	sh autogen.sh
+    sh autogen.sh
 
 to generate the configure file. After that, configure and compile as
 usual to start the whole compilation process:
 
-	./configure --prefix=/opt/janus
-	make
-	make install
+    ./configure --prefix=/opt/janus
+    make
+    make install
 
 Since Janus requires configuration files for both the core and its
 modules in order to work, you'll probably also want to install the
 default configuration files to use, which you can do this way:
 
-	make configs
+    make configs
 
 Remember to only do this once, or otherwise a subsequent ```make configs```
 will overwrite any configuration file you may have modified in the
@@ -226,7 +231,7 @@ If you're installed the above libraries but are not interested in Data
 Channels, WebSockets, MQTT and/or RabbitMQ (or you don't care about any
 of them), you can disable them when configuring:
 
-	./configure --disable-websockets --disable-data-channels --disable-rabbitmq --disable-mqtt
+    ./configure --disable-websockets --disable-data-channels --disable-rabbitmq --disable-mqtt
 
 If the libraries are not installed, instead, no need to manually disable
 them, as the configure script will skip them automatically and disable
@@ -239,7 +244,7 @@ documentation for you. By default the compilation process will not try
 to build the documentation, so if you instead prefer to build it, use the
 --enable-docs configuration option:
 
-	./configure --enable-docs
+    ./configure --enable-docs
 
 You can also selectively enable/disable other features (e.g., specific
 plugins you don't care about, or whether or not you want to build the
@@ -253,20 +258,20 @@ MacOS as well, there are a few aspects to highlight when doing that.
 
 First of all, you can use `brew` to install most of the dependencies:
 
-	brew tap homebrew/boneyard
-	brew install jansson libnice openssl libusrsctp libmicrohttpd libwebsockets cmake rabbitmq-c sofia-sip opus libogg libcurl glib pkg-config gengetopt autoconf automake libtool
+    brew tap homebrew/boneyard
+    brew install jansson libnice openssl libusrsctp libmicrohttpd libwebsockets cmake rabbitmq-c sofia-sip opus libogg libcurl glib pkg-config gengetopt autoconf automake libtool
 
 For what concerns `libsrtp`, which needs to be installed manually, just
 pass `/usr/local` as a prefix when configuring, and proceed as normal:
 
-	[..]
-	./configure --prefix=/usr/local
-	[..]
+    [..]
+    ./configure --prefix=/usr/local
+    [..]
 
 Finally, you may need to provide a custom `prefix` and `PKG_CONFIG_PATH`
 when configuring Janus as well:
 
-	./configure --prefix=/usr/local/janus PKG_CONFIG_PATH=/usr/local/opt/openssl/lib/pkgconfig
+    ./configure --prefix=/usr/local/janus PKG_CONFIG_PATH=/usr/local/opt/openssl/lib/pkgconfig
 
 Everything else works exactly the same way as on Linux.
 
@@ -274,75 +279,75 @@ Everything else works exactly the same way as on Linux.
 To start the gateway, you can use the janus executable. There are several
 things you can configure, either in a configuration file:
 
-	<installdir>/etc/janus/janus.cfg
+    <installdir>/etc/janus/janus.cfg
 
 or on the command line:
 
-	<installdir>/bin/janus --help
+    <installdir>/bin/janus --help
 
-	janus 0.2.1
+    janus 0.2.1
 
-	Usage: janus [OPTIONS]...
+    Usage: janus [OPTIONS]...
 
-	-h, --help                    Print help and exit
-	-V, --version                 Print version and exit
-	-b, --daemon                  Launch Janus in background as a daemon
+    -h, --help                    Print help and exit
+    -V, --version                 Print version and exit
+    -b, --daemon                  Launch Janus in background as a daemon
                                   (default=off)
-	-N, --disable-stdout          Disable stdout based logging  (default=off)
-	-L, --log-file=path           Log to the specified file (default=stdout only)
-	-i, --interface=ipaddress     Interface to use (will be the public IP)
-	-P, --plugins-folder=path     Plugins folder (default=./plugins)
-	-C, --config=filename         Configuration file to use
-	-F, --configs-folder=path     Configuration files folder (default=./conf)
-	-c, --cert-pem=filename       DTLS certificate
-	-k, --cert-key=filename       DTLS certificate key
-	-S, --stun-server=filename    STUN server(:port) to use, if needed (e.g.,
-								  gateway behind NAT, default=none)
-	-1, --nat-1-1=ip              Public IP to put in all host candidates,
+    -N, --disable-stdout          Disable stdout based logging  (default=off)
+    -L, --log-file=path           Log to the specified file (default=stdout only)
+    -i, --interface=ipaddress     Interface to use (will be the public IP)
+    -P, --plugins-folder=path     Plugins folder (default=./plugins)
+    -C, --config=filename         Configuration file to use
+    -F, --configs-folder=path     Configuration files folder (default=./conf)
+    -c, --cert-pem=filename       DTLS certificate
+    -k, --cert-key=filename       DTLS certificate key
+    -S, --stun-server=filename    STUN server(:port) to use, if needed (e.g.,
+                                  gateway behind NAT, default=none)
+    -1, --nat-1-1=ip              Public IP to put in all host candidates,
                                   assuming a 1:1 NAT is in place (e.g., Amazon
                                   EC2 instances, default=none)
-	-E, --ice-enforce-list=list   Comma-separated list of the only interfaces to
+    -E, --ice-enforce-list=list   Comma-separated list of the only interfaces to
                                   use for ICE gathering; partial strings are
                                   supported (e.g., eth0 or eno1,wlan0,
                                   default=none)
-	-X, --ice-ignore-list=list    Comma-separated list of interfaces or IP
+    -X, --ice-ignore-list=list    Comma-separated list of interfaces or IP
                                   addresses to ignore for ICE gathering;
                                   partial strings are supported (e.g.,
                                   vmnet8,192.168.0.1,10.0.0.1 or
                                   vmnet,192.168., default=vmnet)
-	-6, --ipv6-candidates         Whether to enable IPv6 candidates or not
+    -6, --ipv6-candidates         Whether to enable IPv6 candidates or not
                                   (experimental)  (default=off)
-	-l, --libnice-debug           Whether to enable libnice debugging or not
+    -l, --libnice-debug           Whether to enable libnice debugging or not
                                   (default=off)
-	-I, --ice-lite                Whether to enable the ICE Lite mode or not
+    -I, --ice-lite                Whether to enable the ICE Lite mode or not
                                   (default=off)
-	-T, --ice-tcp                 Whether to enable ICE-TCP or not (warning: only
+    -T, --ice-tcp                 Whether to enable ICE-TCP or not (warning: only
                                   works with ICE Lite)
                                   (default=off)
-	-U, --bundle                  Whether to force BUNDLE or not (whether audio,
+    -U, --bundle                  Whether to force BUNDLE or not (whether audio,
                                   video and data will always be bundled)
                                   (default=off)
-	-u, --rtcp-mux                Whether to force rtcp-mux or not (whether RTP
+    -u, --rtcp-mux                Whether to force rtcp-mux or not (whether RTP
                                   and RTCP will always be muxed)  (default=off)
-	-q, --max-nack-queue=number   Maximum size of the NACK queue per user for
+    -q, --max-nack-queue=number   Maximum size of the NACK queue per user for
                                   retransmissions
-	-r, --rtp-port-range=min-max  Port range to use for RTP/RTCP (only available
-								  if the installed libnice supports it)
-	-d, --debug-level=1-7         Debug/logging level (0=disable debugging,
+    -r, --rtp-port-range=min-max  Port range to use for RTP/RTCP (only available
+                                  if the installed libnice supports it)
+    -d, --debug-level=1-7         Debug/logging level (0=disable debugging,
                                   7=maximum debug level; default=4)
-	-D, --debug-timestamps        Enable debug/logging timestamps  (default=off)
-	-o, --disable-colors          Disable color in the logging  (default=off)
-	-a, --apisecret=randomstring  API secret all requests need to pass in order
+    -D, --debug-timestamps        Enable debug/logging timestamps  (default=off)
+    -o, --disable-colors          Disable color in the logging  (default=off)
+    -a, --apisecret=randomstring  API secret all requests need to pass in order
                                   to be accepted by Janus (useful when wrapping
                                   Janus API requests in a server, none by
                                   default)
-	-A, --token-auth              Enable token-based authentication for all
+    -A, --token-auth              Enable token-based authentication for all
                                   requests  (default=off)
 
 Options passed through the command line have the precedence on those
 specified in the configuration file. To start the gateway, simply run:
 
-	<installdir>/bin/janus
+    <installdir>/bin/janus
 
 This will start the gateway, and have it look at the configuration file.
 

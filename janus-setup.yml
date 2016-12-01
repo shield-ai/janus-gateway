@@ -1,0 +1,43 @@
+---
+- hosts: localhost
+  tasks:
+  # dependencies
+  - command: apt-get update
+  - name: install janus dependencies
+    command: apt-get --assume-yes install libmicrohttpd-dev libjansson-dev libnice-dev libssl-dev >
+             libsrtp-dev libsofia-sip-ua-dev libglib2.0-dev libopus-dev libogg-dev libini-config-dev >
+             libcollection-dev pkg-config gengetopt libtool automake dh-autoreconf
+
+  # build libwebsockets
+  - name: create build dir if it doesnt exist
+    file: path="{{playbook_dir}}/libwebsockets/build" state=directory
+
+  - name: cmake libwebsockets
+    command: cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_C_FLAGS="-fpic" .. chdir="{{playbook_dir}}/libwebsockets/build"
+
+  - name: make libwebsockets
+    command: make chdir="{{playbook_dir}}/libwebsockets/build"
+
+  - name: sudo make install libwebsockets
+    command: make install chdir="{{playbook_dir}}/libwebsockets/build" target=install
+    become: yes
+
+  # build janus-gateway
+  - name: janus autogen.sh
+    command: sh "{{playbook_dir}}/autogen.sh"
+
+  - name: configure janus
+    command: "{{playbook_dir}}/configure --disable-data-channels --disable-rabbitmq --disable-mqtt --prefix=/opt/janus"
+
+  - name: make janus
+    command: make chdir="{{playbook_dir}}"
+
+  - name: make install janus
+    command: make isntall chdir="{{playbook_dir}}"
+
+  # copy our config files
+  - copy:
+      src: ./shieldconfigs/
+      dest: /opt/janus/etc/janus/
+      owner: root
+      group: root
