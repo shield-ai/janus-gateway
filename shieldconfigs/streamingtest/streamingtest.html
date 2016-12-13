@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Janus WebRTC Gateway: Streaming Demo</title>
+<script type="text/javascript" src="jquery.min.js" ></script>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+<script type="text/javascript" src="js/bootbox.min.js"></script>
+<script type="text/javascript" src="js/spin.min.js"></script>
+<script type="text/javascript" src="janus.js" ></script>
+<script type="text/javascript" src="streamingtest.js"></script>
+<script>
+	$(function() {
+		$(".navbar-static-top").load("navbar.html", function() {
+			$(".navbar-static-top li.dropdown").addClass("active");
+			$(".navbar-static-top a[href='streamingtest.html']").parent().addClass("active");
+		});
+		$(".footer").load("footer.html");
+	});
+</script>
+<link rel="stylesheet" href="css/cerulean/bootstrap.css" type="text/css"/>
+<link rel="stylesheet" href="css/demo.css" type="text/css"/>
+<link rel="stylesheet" href="css/font-awesome.css" type="text/css"/>
+</head>
+<body>
+
+<img src="shield_logo.jpg" width="75" style="margin-left: 20px; margin-top: 20px;"/>
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="page-header">
+				<h1>Streaming Test
+					<input id="ip-input" type="text" placeholder="janus machine ip"></input>
+					<button class="btn btn-default" autocomplete="off" id="start">Start</button>
+				</h1>
+			</div>
+			<div class="container" id="details">
+				<div class="row">
+					<div class="col-md-12">
+						<h3>Details</h3>
+						<p>This page allows you to view video streaming output from any machine running janus.</p>
+						<p>Enter the ip address of the target machine and press the <code>Start</code> button above to launch the demo.</p>
+						<p>Just choose the stream you're interested in and press the <code>Watch</code> button to start
+						the playout. Stopping it will allow you to switch to a different one.</p>
+					</div>
+				</div>
+			</div>
+			<div class="container hide" id="streams">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Streams <i id="update-streams" class="fa fa-refresh" title="Update list of streams" style="cursor: pointer;"></i></h3>
+							</div>
+							<div class="panel-body" id="list">
+								<div class="btn-group btn-group-sm">
+									<button class="btn btn-primary" autocomplete="off" id="watch">Watch</button>
+									<div class="btn-group btn-group-sm">
+										<button autocomplete="off" id="streamset" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+											Streams list<span class="caret"></span>
+										</button>
+										<ul id="streamslist" class="dropdown-menu" role="menu">
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Stream <span class="label label-info hide" id="status"></h3>
+							</div>
+							<div class="panel-body" id="stream"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<hr>
+	<div class="footer">
+	</div>
+</div>
+
+</body>
+</html>
