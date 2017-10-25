@@ -411,7 +411,39 @@ static gpointer janus_sessions_watchdog(gpointer user_data) {
 	return NULL;
 }
 
+void delete_session(gpointer value, gpointer user_data);
+void delete_session(gpointer value, gpointer user_data)
+{
+    uint64_t session_id = *(uint64_t *)value;
+
+    janus_session * session = janus_session_find(session_id);
+    /* Schedule the session for deletion */
+    session->destroy = 1;
+    janus_mutex_lock(&sessions_mutex);
+    g_hash_table_remove(sessions, &session->session_id);
+    g_hash_table_insert(old_sessions, janus_uint64_dup(session->session_id), session);
+    GSource *timeout_source = g_timeout_source_new_seconds(3);
+    g_source_set_callback(timeout_source, janus_cleanup_session, session, NULL);
+    g_source_attach(timeout_source, sessions_watchdog_context);
+    g_source_unref(timeout_source);
+    janus_mutex_unlock(&sessions_mutex);
+    /* Notify the source that the session has been destroyed */
+    if(session->source && session->source->transport)
+        session->source->transport->session_over(session->source->instance, session->session_id, FALSE);
+}
+
+
 janus_session *janus_session_create(guint64 session_id) {
+    {
+        //Destroy previous sessions
+        JANUS_LOG(LOG_INFO, "Deleting old sessions\n");
+        janus_mutex_lock(&sessions_mutex);
+        GList * keys = g_hash_table_get_keys(sessions);
+        GList * new_keys = g_list_copy(keys);
+        janus_mutex_unlock(&sessions_mutex);
+        g_list_foreach(new_keys, delete_session, NULL); 
+        g_list_free(new_keys);
+    }
 	if(session_id == 0) {
 		while(session_id == 0) {
 			session_id = janus_random_uint64();
