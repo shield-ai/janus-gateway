@@ -32,6 +32,8 @@
 #include "rtcp.h"
 #include "apierror.h"
 
+void delete_session(gpointer key, gpointer value, gpointer gateway_session);
+
 /* STUN server/port, if any */
 static char *janus_stun_server = NULL;
 static uint16_t janus_stun_port = 0;
@@ -908,12 +910,22 @@ void janus_ice_stats_reset(janus_ice_stats *stats) {
 	stats->sl_nack_recent_cnt = 0;
 }
 
+void delete_session(gpointer key, gpointer value, gpointer gateway_session)
+{
+	uint64_t handle_id = *(uint64_t *)key;
+	janus_ice_handle_destroy(gateway_session, handle_id);
+}
 
 /* ICE Handles */
 janus_ice_handle *janus_ice_handle_create(void *gateway_session) {
 	if(gateway_session == NULL)
 		return NULL;
+
 	janus_session *session = (janus_session *)gateway_session;
+	//Destroy previous sessions
+	g_hash_table_foreach(session->ice_handles, delete_session, gateway_session);
+	g_hash_table_remove_all(session->ice_handles);
+
 	guint64 handle_id = 0;
 	while(handle_id == 0) {
 		handle_id = janus_random_uint64();
