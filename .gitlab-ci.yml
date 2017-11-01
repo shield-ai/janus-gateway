@@ -1,0 +1,24 @@
+image: ubuntu:16.04
+
+stages:
+  - build-and-deploy
+
+build:
+  stage: build-and-deploy
+  before_script:
+    - apt-get update
+    - apt-get install checkinstall libmicrohttpd-dev libjansson-dev libnice-dev libssl-dev libsrtp-dev libsofia-sip-ua-dev libglib2.0-dev libopus-dev libogg-dev libini-config-dev libcollection-dev pkg-config gengetopt libtool automake dh-autoreconf libwebsockets-dev -y
+  script:
+    - sh autogen.sh
+    - ./configure --disable-data-channels --disable-rabbitmq --disable-mqtt --prefix="/opt/janus"
+    - make
+    - make install
+    - cp -r ./shieldconfigs/* /opt/janus/etc/janus/
+    - checkinstall --install=no --fstrans=yes --pkgsource="https://github.com/shield-ai/janus-gateway" --pkglicense="LGPL 2.1" --deldesc=no --nodoc --maintainer="$USER@shield.ai" --pkgarch="$(dpkg --print-architecture)" --pkgversion="0.0.1" --pkgrelease="stable" --pkgname=janus-gateway --requires="libmicrohttpd-dev,libjansson-dev,libnice-dev,libssl-dev,libsrtp-dev,libsofia-sip-ua-dev,libglib2.0-dev,libopus-dev,libogg-dev,libini-config-dev,libcollection-dev,pkg-config,gengetopt,libtool,automake,dh-autoreconf,libwebsockets-dev"
+    - dpkg -x janus-gateway_0.0.1-stable_amd64.deb temp
+    - cp -r shieldconfigs/* temp/opt/janus/etc/janus/
+    - dpkg -e janus-gateway_0.0.1-stable_amd64.deb temp/DEBIAN
+    - dpkg -b temp janus-gateway-shield_0.0.1-stable_amd64.deb
+  artifacts:
+    paths:
+      - janus-gateway-shield_0.0.1-stable_amd64.deb
