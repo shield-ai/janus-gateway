@@ -349,6 +349,7 @@ typedef struct janus_streaming_file_source {
 #define JANUS_STREAMING_VP8		0
 #define JANUS_STREAMING_H264	1
 #define JANUS_STREAMING_VP9		2
+#define JANUS_STREAMING_H265		3
 typedef struct janus_streaming_codecs {
 	gint audio_pt;
 	char *audio_rtpmap;
@@ -2543,6 +2544,8 @@ janus_streaming_mountpoint *janus_streaming_create_rtp_source(
 			live_rtp->codecs.video_codec = JANUS_STREAMING_VP9;
 		else if(strstr(vrtpmap, "h264") || strstr(vrtpmap, "H264"))
 			live_rtp->codecs.video_codec = JANUS_STREAMING_H264;
+		else if(strstr(vrtpmap, "h265") || strstr(vrtpmap, "H265"))
+			live_rtp->codecs.video_codec = JANUS_STREAMING_H265;
 	}
 	live_rtp->codecs.video_pt = dovideo ? vcodec : -1;
 	live_rtp->codecs.video_rtpmap = dovideo ? g_strdup(vrtpmap) : NULL;
@@ -3613,6 +3616,8 @@ static gboolean janus_streaming_is_keyframe(gint codec, char* buffer, int len) {
 		}
 		/* If we got here it's not a key frame */
 		return FALSE;
+	} else if(codec == JANUS_STREAMING_H265) {
+		return TRUE;
 	} else {
 		/* FIXME Not a clue */
 		return FALSE;
